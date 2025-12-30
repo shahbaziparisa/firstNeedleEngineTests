@@ -1,57 +1,59 @@
+![Project Screenshot](https://www.dropbox.com/scl/fi/23k9lvd50mq063ddnn9rd/Screenshot-2025-12-30-at-7.04.11-PM.png?rlkey=9l4cpit9580kb96cku0ww5aws&dl=1)
+
 # Needle Engine Test Project
 
-این پروژه یک نمونه از موتور Needle Engine است که با استفاده از Vite ساخته شده. این پروژه شامل کامپوننت‌های سفارشی برای چرخش و رنگ‌آمیزی اشیاء سه‌بعدی است.
+This is a sample project using the Needle Engine, built with Vite. It includes custom components for rotating and coloring 3D objects.
 
-## ویژگی‌ها
+## Features
 
-- **مکعب چرخان**: یک مکعب خاکستری که به طور مداوم حول محور Y می‌چرخد (با استفاده از کامپوننت `Rotate`).
-- **سایه‌های تماس**: سایه‌های خودکار برای بهبود جلوه‌های بصری.
-- **SceneSwitcher**: امکان بارگذاری و تعویض صحنه‌های مختلف از URLهای ابری.
-- **جلوه‌های پس‌پردازش**: شامل Sharpening، Tone Mapping (AgX)، Antialiasing و Bloom.
-- **کامپوننت‌های سفارشی**:
-  - `Rotate`: چرخش شیء با سرعت قابل تنظیم.
-  - `Colorize`: تغییر رنگ شیء به سبز.
+- **Rotating Cube**: A gray cube that continuously rotates around the Y-axis (using the `Rotate` component).
+- **Contact Shadows**: Automatic shadows for enhanced visual effects.
+- **SceneSwitcher**: Ability to load and switch between different scenes from cloud URLs.
+- **Post-Processing Effects**: Includes Sharpening, Tone Mapping (AgX), Antialiasing, and Bloom.
+- **Custom Components**:
+  - `Rotate`: Rotates the object at a configurable speed.
+  - `Colorize`: Changes the object's color to green.
 
-## شروع کار
+## Getting Started
 
-### پیش‌نیازها
-- Node.js (نسخه 16 یا بالاتر)
-- npm یا yarn
+### Prerequisites
+- Node.js (version 16 or higher)
+- npm or yarn
 
-### نصب و اجرا
-1. وابستگی‌ها را نصب کنید:
+### Installation and Running
+1. Install dependencies:
    ```bash
    npm install
    ```
 
-2. پروژه را اجرا کنید:
+2. Run the project:
    ```bash
    npm start
    ```
-   این دستور سرور توسعه Vite را راه‌اندازی می‌کند و پروژه را در مرورگر باز می‌کند.
+   This starts the Vite development server and opens the project in the browser.
 
-### ساخت برای تولید
+### Build for Production
 ```bash
 npm run build:production
 ```
 
-## ساختار پروژه
+## Project Structure
 
-- `src/main.ts`: فایل اصلی تنظیم صحنه و کامپوننت‌ها.
-- `src/scripts/Rotate.ts`: کامپوننت چرخش.
-- `src/scripts/Colorize.ts`: کامپوننت رنگ‌آمیزی.
-- `assets/`: فایل‌های دارایی‌ها.
-- `include/`: فایل‌های اضافی Needle Engine.
+- `src/main.ts`: Main file for setting up the scene and components.
+- `src/scripts/Rotate.ts`: Rotation component.
+- `src/scripts/Colorize.ts`: Coloring component.
+- `assets/`: Asset files.
+- `include/`: Additional Needle Engine files.
 
-## نمونه‌ها و مستندات
-- [نمونه‌های Needle Engine](https://engine.needle.tools/samples)
-- [مستندات Needle Engine](https://docs.needle.tools)
-- [مجموعه Stackblitz Needle Engine](https://stackblitz.com/@marwie/collections/needle-engine)
+## Samples and Documentation
+- [Needle Engine Samples](https://engine.needle.tools/samples)
+- [Needle Engine Documentation](https://docs.needle.tools)
+- [Stackblitz Needle Engine Collection](https://stackblitz.com/@marwie/collections/needle-engine)
 
-اگر سؤالی دارید، در [فروم ما](https://forum.needle.tools) مطرح کنید.
+If you have questions, reach out in our [forum](https://forum.needle.tools).
 
-## مشارکت
-برای مشارکت، لطفاً یک Pull Request ارسال کنید یا در فروم بحث کنید.
+## Contributing
+For contributions, please submit a Pull Request or discuss in the forum.
 
-## تماس
-[Needle Tools](https://needle.tools) • [@NeedleTools](https://twitter.com/NeedleTools) • [فروم](https://forum.needle.tools) • [یوتیوب](https://www.youtube.com/@needle-tools)
+## Contact
+[Needle Tools](https://needle.tools) • [@NeedleTools](https://twitter.com/NeedleTools) • [Forum](https://forum.needle.tools) • [YouTube](https://www.youtube.com/@needle-tools)
