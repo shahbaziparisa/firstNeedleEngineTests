@@ -1,14 +1,16 @@
-import { onStart, RemoteSkybox, WebXR, addComponent, ContactShadows, SceneSwitcher, findObjectOfType, OrbitControls, PostProcessingManager, ToneMappingEffect, BloomEffect, SharpeningEffect, ScreenSpaceAmbientOcclusionN8, ObjectUtils, onUpdate, Gizmos, getTempVector, GroundProjectedEnv, fitObjectIntoVolume, Antialiasing, AnimationUtils, Mathf, useForAutoFit, setAutoFitEnabled } from "@needle-tools/engine";
+import { onStart, RemoteSkybox, WebXR, addComponent, ContactShadows, findObjectOfType, OrbitControls, PostProcessingManager, ToneMappingEffect, BloomEffect, SharpeningEffect, ScreenSpaceAmbientOcclusionN8, ObjectUtils, onUpdate, Gizmos, getTempVector, GroundProjectedEnv, fitObjectIntoVolume, Antialiasing, AnimationUtils, Mathf, useForAutoFit, setAutoFitEnabled } from "@needle-tools/engine";
 import * as THREE from "three";
 import { Rotate } from "./scripts/Rotate.js";
 import { Colorize } from "./scripts/Colorize.js";
+import { Selector } from "./scripts/Selector.js";
+import { TextureChanger } from "./scripts/TextureChanger.js";
 
 // onStart is an easy way to hook into needle engine (this is called once at the beginning of the update loop)
 onStart(context => {
     const scene = context.scene;
 
     context.mainCamera.position.set(0,1,10);
-    context.menu.showFullscreenOption(true);
+    // context.menu.showFullscreenOption(true);
 
 
     // To add contact shadows we can add the ContactShadows component to the scene (scene.addComponent(ContactShadows))
@@ -17,115 +19,72 @@ onStart(context => {
     contactshadows.darkness = .8;
     contactshadows.opacity = .9;
 
-    // Needle Engine offers a couple of helper methods for creating common simple shapes. 
-    // But you can also use all the regular three.js APIs at any time
-    const cylinder = ObjectUtils.createPrimitive("Cylinder", {
-        scale: [1, .05, 1],
-        position: [0, -.025, 0],
-        material: new THREE.MeshStandardMaterial({
-            color: new THREE.Color(0.3,0.8,0.8),
-            metalness: .1,
-            roughness: .6,
-        })
-    });
-    setAutoFitEnabled(cylinder, false);
-    scene.add(cylinder);
+   
 
     // Create a cube and add the Rotate component
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
     const cube = new THREE.Mesh(geometry, material);
     cube.position.set(1, 0.5, 0);
+    cube.name = "Cube";
     scene.add(cube);
     addComponent(cube, new Rotate()); 
     addComponent(cube, new Colorize());
+    addComponent(cube, new Selector());
 
-    const sceneSwitcher = addComponent(scene, SceneSwitcher, {
-        autoLoadFirstScene: false,
-        createMenuButtons: true,
-        clamp: false,
-        preloadNext: 1,
-        preloadPrevious: 1,
+    // Create a sphere
+    const sphere = ObjectUtils.createPrimitive("Sphere", {
+        position: [-1, 0.5, 0],
+        material: new THREE.MeshStandardMaterial({ color: 0xff0000 })
     });
-    sceneSwitcher.addScene("https://cloud.needle.tools/-/assets/Z23hmXBZ21QnG-latest-world/file");
-    sceneSwitcher.addScene("https://cloud.needle.tools/-/assets/Z23hmXBzvPW9-latest-product/file");
-    sceneSwitcher.addScene("https://cloud.needle.tools/-/assets/Z23hmXBZvGGVp-latest-product/file");
-    sceneSwitcher.addScene("https://cloud.needle.tools/-/assets/Z23hmXBZ20RjNk-latest-product/file");
-    sceneSwitcher.addScene("https://cloud.needle.tools/-/assets/Z23hmXB27L6Db-1QlLnf-world/file");
-    sceneSwitcher.addScene("https://cloud.needle.tools/-/assets/Z23hmXBZ2sPRdk-world/file");
+    sphere.name = "Sphere";
+    scene.add(sphere);
+    addComponent(sphere, new Selector());
 
-    sceneSwitcher.sceneLoaded.addEventListener(()=>{
-        const loaded = sceneSwitcher.currentlyLoadedScene?.asset
-        if (loaded) {
+    // Create a box (rectangular prism)
+    const boxGeometry = new THREE.BoxGeometry(1, 2, 0.5);
+    const boxMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+    const box = new THREE.Mesh(boxGeometry, boxMaterial);
+    box.position.set(0, 1, -2);
+    box.name = "Box";
+    scene.add(box);
+    addComponent(box, new Selector());
 
-            const volumeSize = new THREE.Vector3(1,1.5,1);
-            fitObjectIntoVolume(loaded, new THREE.Box3().setFromCenterAndSize(new THREE.Vector3(0,volumeSize.y*.501,0), volumeSize));
+    // Add TextureChanger to scene
+    addComponent(scene, new TextureChanger());
 
-            contactshadows.fitShadows({object:loaded, positionOffset: {y:0.01}});
+    // Create circular texture menu
+    const menuDiv = document.createElement('div');
+    menuDiv.id = 'texture-menu';
 
-            AnimationUtils.autoplayAnimations(loaded);
-
-            const orbitControls = findObjectOfType(OrbitControls);
-            if (orbitControls) {
-                orbitControls.enablePan = true;
-                orbitControls.fitCamera({
-                    objects: loaded,
-                    immediate: false,
-                    fitOffset: 1,
-                    fitDirection: {x:-.5,y:.3,z:1},
-                    relativeTargetOffset: {y:0},
-                    fov: 20,
-                });
+    for (let i = 0; i < 4; i++) {
+        const button = document.createElement('button');
+        button.textContent = `${i + 1}`;
+        button.style.backgroundColor = `hsl(${i * 90}, 100%, 50%)`;
+        button.addEventListener('click', () => {
+            TextureChanger.currentTextureIndex = i;
+            // Apply texture immediately
+            if (Selector.selectedObject) {
+                const mesh = Selector.selectedObject as any as THREE.Mesh;
+                if (mesh.material instanceof THREE.MeshStandardMaterial) {
+                    const texture = TextureChanger.textures[i];
+                    texture.needsUpdate = true;
+                    mesh.material.map = texture;
+                    mesh.material.color.set(0xffffff);
+                    mesh.material.transparent = false;
+                    mesh.material.opacity = 1;
+                    mesh.material.needsUpdate = true;
+                }
             }
-        }
-    })
+        });
+        menuDiv.appendChild(button);
+    }
 
-    sceneSwitcher.select(0);
-
-
-    // To add postprocessing simple add a PostProcessingManager component to your scene
-    const post = addComponent(context.scene, PostProcessingManager);
-    post.addEffect(new SharpeningEffect());
-    post.addEffect(new ToneMappingEffect()).setMode("AgX")
-    post.addEffect(new Antialiasing());
-    const bloom = post.addEffect(new BloomEffect());
-    bloom.scatter.value = .9;
-    bloom.threshold.value = 2;
-    bloom.intensity.value = .2;
+    document.body.appendChild(menuDiv);
 
 
-    /*
-    // adding WebXR support can be done by simply adding a WebXR component. 
-    // For more fine-grained control use the static NeedleXRSession methods
-    addComponent(scene, WebXR, {
-        createARButton: true,
-        createQRCode: true,
-        createVRButton: true,
-        createSendToQuestButton: true,
-    });
-    */
+   
 
-
-    // you can use also regular threejs syntax to create objects
-    /*
-    const geometry = new THREE.BoxGeometry( 1, 1, 1 ); 
-    const material = new THREE.MeshStandardMaterial( { color: 0xaaaaaa } ); 
-    const cube = new THREE.Mesh(geometry, material); 
-    cube.position.x = 1;
-    cube.position.y += .5;
-    scene.add(cube);
-    // use `addComponent` to add components to objects
-    addComponent(cube, new Rotate(), { 
-        // You can initialize component properties inline:
-        // speed: 5
-    });
-    // DragControls is a builtin Needle Engine componen to allow users to drag an object.
-    // This works on desktop as well as AR or VR
-    addComponent(cube, DragControls, {
-        showGizmo: false,
-        dragMode: DragMode.XZPlane,
-    });
-    */
 
 })
 
